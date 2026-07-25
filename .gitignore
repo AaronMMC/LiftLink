@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+htmlcov/
+.coverage
+
+# AWS SAM
+.aws-sam/
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/build/
+
+# Secrets — never commit real values
+.env
+.env.local
+
+# OS cruft
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+*.swp
+*.swo
