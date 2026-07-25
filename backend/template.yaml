@@ -1,0 +1,258 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  LiftLink — A two-sided fitness marketplace connecting instructors with clients.
+  Serverless backend on AWS Free Tier.
+
+Parameters:
+  Stage:
+    Type: String
+    Default: dev
+    AllowedValues:
+      - dev
+      - prod
+
+Globals:
+  Function:
+    Runtime: python3.12
+    Timeout: 10
+    MemorySize: 128
+    Environment:
+      Variables:
+        TABLE_NAME: !Ref LiftLinkTable
+        STAGE: !Ref Stage
+    Architectures:
+      - x86_64
+
+Resources:
+  # ─── DynamoDB ───
+  LiftLinkTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub "LiftLinkTable-${Stage}"
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: PK
+          AttributeType: S
+        - AttributeName: SK
+          AttributeType: S
+        - AttributeName: GSI1PK
+          AttributeType: S
+        - AttributeName: GSI1SK
+          AttributeType: S
+      KeySchema:
+        - AttributeName: PK
+          KeyType: HASH
+        - AttributeName: SK
+          KeyType: RANGE
+      GlobalSecondaryIndexes:
+        - IndexName: SpecialtyLocationIndex
+          KeySchema:
+            - AttributeName: GSI1PK
+              KeyType: HASH
+            - AttributeName: GSI1SK
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
+
+  # ─── Cognito ───
+  LiftLinkUserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: !Sub "LiftLinkUserPool-${Stage}"
+      AutoVerifiedAttributes:
+        - email
+      UsernameAttributes:
+        - email
+      Schema:
+        - Name: email
+          Required: true
+          Mutable: true
+        - Name: user_role
+          AttributeDataType: String
+          Mutable: true
+          Required: false
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 8
+          RequireLowercase: true
+          RequireNumbers: true
+          RequireSymbols: false
+          RequireUppercase: true
+
+  LiftLinkUserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName: !Sub "LiftLinkClient-${Stage}"
+      UserPoolId: !Ref LiftLinkUserPool
+      ExplicitAuthFlows:
+        - ALLOW_USER_PASSWORD_AUTH
+        - ALLOW_REFRESH_TOKEN_AUTH
+        - ALLOW_USER_SRP_AUTH
+      GenerateSecret: false
+
+  # ─── HTTP API ───
+  LiftLinkApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      StageName: !Ref Stage
+      CorsConfiguration:
+        AllowOrigins:
+          - "*"
+        AllowHeaders:
+          - Content-Type
+          - Authorization
+        AllowMethods:
+          - GET
+          - POST
+          - PUT
+          - DELETE
+          - OPTIONS
+      Auth:
+        DefaultAuthorizer: CognitoAuthorizer
+        Authorizers:
+          CognitoAuthorizer:
+            AuthorizationScopes:
+              - openid
+            IdentitySource: $request.header.Authorization
+            JwtConfiguration:
+              issuer: !Sub "https://cognito-idp.${AWS::Region}.amazonaws.com/${LiftLinkUserPool}"
+              audience:
+                - !Ref LiftLinkUserPoolClient
+
+  # ─── Lambda Functions ───
+  CreateProfileFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "LiftLink-CreateProfile-${Stage}"
+      Handler: create_profile.handler
+      CodeUri: src/handlers/instructors/
+      Events:
+        Api:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref LiftLinkApi
+            Path: /instructors
+            Method: POST
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref LiftLinkTable
+
+  GetProfileFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "LiftLink-GetProfile-${Stage}"
+      Handler: get_profile.handler
+      CodeUri: src/handlers/instructors/
+      Events:
+        Api:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref LiftLinkApi
+            Path: /instructors/{id}
+            Method: GET
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref LiftLinkTable
+
+  UpdateProfileFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "LiftLink-UpdateProfile-${Stage}"
+      Handler: update_profile.handler
+      CodeUri: src/handlers/instructors/
+      Events:
+        Api:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref LiftLinkApi
+            Path: /instructors/{id}
+            Method: PUT
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref LiftLinkTable
+
+  SearchInstructorsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "LiftLink-SearchInstructors-${Stage}"
+      Handler: search_instructors.handler
+      CodeUri: src/handlers/instructors/
+      Events:
+        Api:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref LiftLinkApi
+            Path: /instructors
+            Method: GET
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref LiftLinkTable
+
+  CreateEntryFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "LiftLink-CreateEntry-${Stage}"
+      Handler: create_entry.handler
+      CodeUri: src/handlers/progress/
+      Events:
+        Api:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref LiftLinkApi
+            Path: /progress
+            Method: POST
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref LiftLinkTable
+
+  ListEntriesFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "LiftLink-ListEntries-${Stage}"
+      Handler: list_entries.handler
+      CodeUri: src/handlers/progress/
+      Events:
+        Api:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref LiftLinkApi
+            Path: /progress
+            Method: GET
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref LiftLinkTable
+
+  GetHistoryFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: !Sub "LiftLink-GetHistory-${Stage}"
+      Handler: get_history.handler
+      CodeUri: src/handlers/clients/
+      Events:
+        Api:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref LiftLinkApi
+            Path: /clients/{id}/history
+            Method: GET
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref LiftLinkTable
+
+Outputs:
+  ApiUrl:
+    Description: URL of the HTTP API
+    Value: !Sub "https://${LiftLinkApi}.execute-api.${AWS::Region}.amazonaws.com/${Stage}"
+
+  UserPoolId:
+    Description: Cognito User Pool ID
+    Value: !Ref LiftLinkUserPool
+
+  UserPoolClientId:
+    Description: Cognito User Pool Client ID
+    Value: !Ref LiftLinkUserPoolClient
+
+  TableName:
+    Description: DynamoDB Table Name
+    Value: !Ref LiftLinkTable
