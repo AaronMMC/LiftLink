@@ -28,11 +28,13 @@ We chose **AWS SAM**.
 ## Consequences
 
 **Gains:**
+
 - Single `template.yaml` captures the full stack — easy to audit, diff, and review
 - SAM CLI's local tooling reduces iteration time and cloud costs to zero during development
 - Lower learning curve for someone new to serverless IaC
 
 **Trade-offs:**
+
 - YAML over a real language — no loops, conditionals, or type-checking in the template
 - If the project grew to 50+ functions, CDK constructs would provide better organization
 

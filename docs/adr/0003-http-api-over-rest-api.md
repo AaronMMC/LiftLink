@@ -29,11 +29,13 @@ We chose **HTTP API** (`AWS::Serverless::HttpApi`).
 ## Consequences
 
 **Gains:**
+
 - Simpler SAM template — the `Auth` block in `AWS::Serverless::HttpApi` is cleaner than REST API authorizer wiring
 - Lower cost per request, contributing to the $0 spend target
 - Faster cold-start API responses
 
 **Trade-offs:**
+
 - No built-in request/response validation (we validate in Lambda code instead — arguably better practice anyway)
 - No API key or usage plan support (not needed for this app)
 - No built-in response caching (could use CloudFront later if needed)

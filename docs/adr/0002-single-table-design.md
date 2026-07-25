@@ -23,7 +23,7 @@ DynamoDB charges per table (On-Demand removes capacity planning) but the key des
 ### Schema
 
 | Item Type | PK | SK | GSI1PK | GSI1SK |
-|---|---|---|---|---|
+| --- | --- | --- | --- | --- |
 | Instructor Profile | `INSTRUCTOR#{id}` | `PROFILE` | `SPECIALTY#{specialty}` | `LOCATION#{location}` |
 | Progress (client view) | `PROGRESS#{client_id}` | `ENTRY#{timestamp}#{entry_id}` | — | — |
 | Progress (instructor view) | `INSTRUCTOR_PROGRESS#{instructor_id}` | `ENTRY#{timestamp}#{entry_id}` | — | — |
@@ -37,7 +37,7 @@ DynamoDB charges per table (On-Demand removes capacity planning) but the key des
 ### Access Pattern Mapping
 
 | Access Pattern | Key Used | Operation |
-|---|---|---|
+| --- | --- | --- |
 | Get instructor profile | PK=`INSTRUCTOR#{id}`, SK=`PROFILE` | `GetItem` |
 | Update instructor profile | PK=`INSTRUCTOR#{id}`, SK=`PROFILE` | `PutItem` |
 | Search by specialty | GSI1PK=`SPECIALTY#{spec}` | `Query` on GSI1 |
@@ -49,6 +49,7 @@ DynamoDB charges per table (On-Demand removes capacity planning) but the key des
 ### Dual-Write Pattern for Progress Entries
 
 Progress entries are written twice:
+
 1. Under `PROGRESS#{client_id}` — for client history queries
 2. Under `INSTRUCTOR_PROGRESS#{instructor_id}` — for instructor listing queries
 
@@ -57,12 +58,14 @@ This avoids a GSI on progress entries and keeps both read paths as efficient sin
 ## Consequences
 
 **Gains:**
+
 - One table, one bill, one set of capacity settings
 - Every access pattern resolves to a single `GetItem` or `Query` — no scans, no filters
 - Timestamp-based sort keys provide natural chronological ordering
 - Specialty + location search is a single GSI query
 
 **Trade-offs:**
+
 - Dual-write for progress entries increases write cost (2 writes per entry) but eliminates the need for a second GSI
 - Item type overloading means the table is less self-documenting — the ADR and key-builder code (`db.py`) serve as the schema reference
 - Adding a new item type requires careful key design to avoid collisions

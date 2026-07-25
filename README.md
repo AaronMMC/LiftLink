@@ -1,8 +1,8 @@
-# LiftLink 💪
+# LiftLink
 
 > A two-sided fitness marketplace connecting instructors with clients — built serverless on AWS Free Tier.
 
-[![🚧 Work In Progress](https://img.shields.io/badge/status-WIP-yellow)](https://github.com/AaronMMC/LiftLink)
+[![ Work In Progress](https://img.shields.io/badge/status-WIP-yellow)](https://github.com/AaronMMC/LiftLink)
 [![Built on AWS Free Tier](https://img.shields.io/badge/AWS-Free%20Tier%20%240-green)](https://aws.amazon.com/free/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
@@ -18,7 +18,7 @@ Finding the right fitness instructor is hard. LiftLink solves this by providing 
 ## Tech Stack
 
 | Layer | Technology |
-|---|---|
+| --- | --- |
 | **IaC** | AWS SAM (`template.yaml`) |
 | **Backend** | Python 3.12, AWS Lambda |
 | **API** | API Gateway HTTP API |
@@ -30,9 +30,9 @@ Finding the right fitness instructor is hard. LiftLink solves this by providing 
 
 ## Architecture
 
-```
+```text
 ┌─────────────┐     ┌──────────────┐     ┌─────────────────┐
-│   React SPA │────▶│  API Gateway │────▶│  Lambda (x7)    │
+│   React SPA │────│  API Gateway │────│  Lambda (x7)    │
 │   (S3)      │     │  HTTP API    │     │  Python 3.12    │
 └─────────────┘     │  + JWT Auth  │     └────────┬────────┘
                     └──────────────┘              │
@@ -46,7 +46,7 @@ Finding the right fitness instructor is hard. LiftLink solves this by providing 
 ## API Endpoints
 
 | Method | Path | Description | Auth |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | `POST` | `/instructors` | Create instructor profile | Instructor |
 | `GET` | `/instructors/{id}` | Get instructor profile | Any |
 | `PUT` | `/instructors/{id}` | Update own profile | Owner |
@@ -130,7 +130,7 @@ python -m pytest tests/unit/ -v --tb=short
 
 ## Project Structure
 
-```
+```text
 LiftLink/
 ├── backend/
 │   ├── template.yaml          # SAM infrastructure
@@ -154,4 +154,4 @@ LiftLink/
 
 ## License
 
-[MIT](LICENSE) © 2026 LiftLink Contributors
+[MIT](LICENSE)  2026 LiftLink Contributors
