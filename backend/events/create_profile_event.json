@@ -1,0 +1,17 @@
+{
+  "requestContext": {
+    "authorizer": {
+      "jwt": {
+        "claims": {
+          "sub": "instructor-001",
+          "custom:user_role": "instructor"
+        }
+      }
+    },
+    "http": {
+      "method": "POST",
+      "path": "/instructors"
+    }
+  },
+  "body": "{\"display_name\": \"Jane Smith\", \"specialty\": \"yoga\", \"location\": \"new york\", \"bio\": \"Certified yoga instructor with 10 years of experience\"}"
+}

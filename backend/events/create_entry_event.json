@@ -1,0 +1,17 @@
+{
+  "requestContext": {
+    "authorizer": {
+      "jwt": {
+        "claims": {
+          "sub": "instructor-001",
+          "custom:user_role": "instructor"
+        }
+      }
+    },
+    "http": {
+      "method": "POST",
+      "path": "/progress"
+    }
+  },
+  "body": "{\"client_id\": \"client-001\", \"workout_type\": \"Strength Training\", \"notes\": \"Bench press 3x10 at 135lbs. Good form.\", \"duration_minutes\": 60}"
+}

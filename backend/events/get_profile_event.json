@@ -1,0 +1,19 @@
+{
+  "requestContext": {
+    "authorizer": {
+      "jwt": {
+        "claims": {
+          "sub": "client-001",
+          "custom:user_role": "client"
+        }
+      }
+    },
+    "http": {
+      "method": "GET",
+      "path": "/instructors/instructor-001"
+    }
+  },
+  "pathParameters": {
+    "id": "instructor-001"
+  }
+}

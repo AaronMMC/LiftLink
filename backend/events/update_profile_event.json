@@ -1,0 +1,20 @@
+{
+  "requestContext": {
+    "authorizer": {
+      "jwt": {
+        "claims": {
+          "sub": "instructor-001",
+          "custom:user_role": "instructor"
+        }
+      }
+    },
+    "http": {
+      "method": "PUT",
+      "path": "/instructors/instructor-001"
+    }
+  },
+  "pathParameters": {
+    "id": "instructor-001"
+  },
+  "body": "{\"bio\": \"Updated bio with new certifications\", \"specialty\": \"pilates\"}"
+}

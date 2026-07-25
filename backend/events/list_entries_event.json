@@ -1,0 +1,16 @@
+{
+  "requestContext": {
+    "authorizer": {
+      "jwt": {
+        "claims": {
+          "sub": "instructor-001",
+          "custom:user_role": "instructor"
+        }
+      }
+    },
+    "http": {
+      "method": "GET",
+      "path": "/progress"
+    }
+  }
+}
