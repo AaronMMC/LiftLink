@@ -1,0 +1,42 @@
+{
+  "python.defaultInterpreterPath": "C:/Users/aaron/AppData/Local/Programs/Python/Python314/python.exe",
+  "python.terminal.activateEnvironment": true,
+
+  "[python]": {
+    "editor.defaultFormatter": "charliermarsh.ruff",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.fixAll.ruff": "explicit",
+      "source.organizeImports.ruff": "explicit"
+    }
+  },
+
+
+
+  "python.testing.pytestEnabled": true,
+  "python.testing.pytestArgs": [
+    "backend/tests"
+  ],
+  "python.testing.unittestEnabled": false,
+
+  "files.exclude": {
+    "**/__pycache__": true,
+    "**/.aws-sam": true,
+    "**/.venv": true,
+    "**/node_modules": true,
+    "**/frontend/dist": true,
+    "**/frontend/build": true
+  },
+
+  "files.associations": {
+    "*.yaml": "yaml",
+    "*.yml": "yaml"
+  },
+
+  "search.exclude": {
+    "**/.aws-sam": true,
+    "**/node_modules": true,
+    "**/frontend/dist": true,
+    "**/frontend/build": true
+  }
+}

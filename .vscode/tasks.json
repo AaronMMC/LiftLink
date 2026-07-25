@@ -1,0 +1,152 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "SAM: Build",
+      "type": "shell",
+      "command": "sam build",
+      "options": {
+        "cwd": "${workspaceFolder}/backend"
+      },
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "SAM: Local Invoke",
+      "type": "shell",
+      "command": "sam local invoke ${input:samFunctionName} -e events/${input:samEventName} --template template.yaml",
+      "options": {
+        "cwd": "${workspaceFolder}/backend"
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "SAM: Start API (local)",
+      "type": "shell",
+      "command": "sam local start-api --template template.yaml",
+      "options": {
+        "cwd": "${workspaceFolder}/backend"
+      },
+      "group": "none",
+      "isBackground": true,
+      "problemMatcher": []
+    },
+    {
+      "label": "SAM: Validate Template",
+      "type": "shell",
+      "command": "sam validate --lint --template template.yaml",
+      "options": {
+        "cwd": "${workspaceFolder}/backend"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Python: Run Unit Tests",
+      "type": "shell",
+      "command": "python -m pytest tests/unit/ -v --tb=short",
+      "options": {
+        "cwd": "${workspaceFolder}/backend"
+      },
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Python: Run All Tests",
+      "type": "shell",
+      "command": "python -m pytest tests/ -v --tb=short",
+      "options": {
+        "cwd": "${workspaceFolder}/backend"
+      },
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "Python: Run Ruff Linter",
+      "type": "shell",
+      "command": "python -m ruff check src/",
+      "options": {
+        "cwd": "${workspaceFolder}/backend"
+      },
+      "group": "none",
+      "problemMatcher": []
+    },
+    {
+      "label": "Python: Run Ruff Formatter",
+      "type": "shell",
+      "command": "python -m ruff format src/",
+      "options": {
+        "cwd": "${workspaceFolder}/backend"
+      },
+      "group": "none",
+      "problemMatcher": []
+    },
+    {
+      "label": "Frontend: Install Dependencies",
+      "type": "shell",
+      "command": "npm install",
+      "options": {
+        "cwd": "${workspaceFolder}/frontend"
+      },
+      "group": "none",
+      "problemMatcher": []
+    },
+    {
+      "label": "Frontend: Dev Server",
+      "type": "shell",
+      "command": "npm run dev",
+      "options": {
+        "cwd": "${workspaceFolder}/frontend"
+      },
+      "group": "none",
+      "isBackground": true,
+      "problemMatcher": []
+    },
+    {
+      "label": "Frontend: Build",
+      "type": "shell",
+      "command": "npm run build",
+      "options": {
+        "cwd": "${workspaceFolder}/frontend"
+      },
+      "group": "build",
+      "problemMatcher": []
+    }
+  ],
+  "inputs": [
+    {
+      "id": "samFunctionName",
+      "type": "pickString",
+      "description": "Select the SAM function to invoke",
+      "options": [
+        "CreateProfileFunction",
+        "GetProfileFunction",
+        "UpdateProfileFunction",
+        "SearchInstructorsFunction",
+        "GetHistoryFunction",
+        "CreateEntryFunction",
+        "ListEntriesFunction"
+      ]
+    },
+    {
+      "id": "samEventName",
+      "type": "pickString",
+      "description": "Select the event file to use",
+      "options": [
+        "create_profile_event.json",
+        "get_profile_event.json",
+        "update_profile_event.json",
+        "search_instructors_event.json",
+        "get_history_event.json",
+        "create_entry_event.json",
+        "list_entries_event.json"
+      ]
+    }
+  ]
+}
