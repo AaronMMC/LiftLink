@@ -22,13 +22,15 @@ def handler(event: dict, context) -> dict:
         if not item:
             return not_found_response("Instructor not found")
 
-        return success_response({
-            "instructor_id": item["instructor_id"],
-            "display_name": item["display_name"],
-            "specialty": item["specialty"],
-            "location": item["location"],
-            "bio": item.get("bio", ""),
-        })
+        return success_response(
+            {
+                "instructor_id": item["instructor_id"],
+                "display_name": item["display_name"],
+                "specialty": item["specialty"],
+                "location": item["location"],
+                "bio": item.get("bio", ""),
+            }
+        )
     except Exception as e:
         print(f"Error getting profile: {e}")
         return server_error_response()

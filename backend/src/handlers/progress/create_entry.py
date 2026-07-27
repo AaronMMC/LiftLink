@@ -7,8 +7,19 @@ from datetime import datetime, timezone
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from shared.authz import get_user_id, is_instructor
-from shared.db import get_table, progress_pk, progress_sk, instructor_progress_pk, instructor_progress_sk
-from shared.responses import created_response, error_response, forbidden_response, server_error_response
+from shared.db import (
+    get_table,
+    progress_pk,
+    progress_sk,
+    instructor_progress_pk,
+    instructor_progress_sk,
+)
+from shared.responses import (
+    created_response,
+    error_response,
+    forbidden_response,
+    server_error_response,
+)
 
 
 REQUIRED_FIELDS = ["client_id", "workout_type", "notes"]
@@ -64,15 +75,17 @@ def handler(event: dict, context) -> dict:
             batch.put_item(Item=client_item)
             batch.put_item(Item=instructor_item)
 
-        return created_response({
-            "entry_id": entry_id,
-            "instructor_id": instructor_id,
-            "client_id": client_id,
-            "workout_type": body["workout_type"],
-            "notes": body["notes"],
-            "duration_minutes": body.get("duration_minutes", 0),
-            "created_at": timestamp,
-        })
+        return created_response(
+            {
+                "entry_id": entry_id,
+                "instructor_id": instructor_id,
+                "client_id": client_id,
+                "workout_type": body["workout_type"],
+                "notes": body["notes"],
+                "duration_minutes": body.get("duration_minutes", 0),
+                "created_at": timestamp,
+            }
+        )
     except json.JSONDecodeError:
         return error_response("Invalid JSON in request body")
     except Exception as e:

@@ -6,7 +6,13 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from shared.authz import is_resource_owner, is_instructor
 from shared.db import get_table, instructor_pk, instructor_sk, gsi1_pk, gsi1_sk
-from shared.responses import success_response, error_response, forbidden_response, not_found_response, server_error_response
+from shared.responses import (
+    success_response,
+    error_response,
+    forbidden_response,
+    not_found_response,
+    server_error_response,
+)
 
 
 UPDATABLE_FIELDS = ["display_name", "specialty", "location", "bio"]
@@ -30,7 +36,9 @@ def handler(event: dict, context) -> dict:
 
         updates = {k: v for k, v in body.items() if k in UPDATABLE_FIELDS and v}
         if not updates:
-            return error_response(f"No valid fields to update. Updatable: {', '.join(UPDATABLE_FIELDS)}")
+            return error_response(
+                f"No valid fields to update. Updatable: {', '.join(UPDATABLE_FIELDS)}"
+            )
 
         table = get_table()
 
@@ -50,13 +58,15 @@ def handler(event: dict, context) -> dict:
 
         table.put_item(Item=item)
 
-        return success_response({
-            "instructor_id": item["instructor_id"],
-            "display_name": item["display_name"],
-            "specialty": item["specialty"],
-            "location": item["location"],
-            "bio": item.get("bio", ""),
-        })
+        return success_response(
+            {
+                "instructor_id": item["instructor_id"],
+                "display_name": item["display_name"],
+                "specialty": item["specialty"],
+                "location": item["location"],
+                "bio": item.get("bio", ""),
+            }
+        )
     except json.JSONDecodeError:
         return error_response("Invalid JSON in request body")
     except Exception as e:

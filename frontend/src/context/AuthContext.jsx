@@ -1,3 +1,5 @@
+/* eslint-disable react-refresh/only-export-components */
+/* eslint-disable react/only-export-components */
 import { createContext, useContext, useState, useEffect } from "react";
 import { getCurrentUser, signIn as authSignIn, signUp as authSignUp, signOut as authSignOut } from "../services/auth";
 

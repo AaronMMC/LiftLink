@@ -25,6 +25,7 @@ def success_response(body: Any, status_code: int = 200) -> dict:
         "body": json.dumps(body, cls=DecimalEncoder),
     }
 
+
 def created_response(body: Any) -> dict:
     """Return a 201 Created response."""
     return success_response(body, status_code=201)

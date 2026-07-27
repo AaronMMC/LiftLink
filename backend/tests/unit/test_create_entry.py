@@ -5,7 +5,9 @@ import os
 import boto3
 from moto import mock_aws
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "src", "handlers"))
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "..", "src", "handlers")
+)
 
 TABLE_NAME = "LiftLinkTable"
 
@@ -40,11 +42,7 @@ def _create_table(dynamodb):
 def _make_event(sub: str, role: str, body: dict = None) -> dict:
     event = {
         "requestContext": {
-            "authorizer": {
-                "jwt": {
-                    "claims": {"sub": sub, "custom:user_role": role}
-                }
-            }
+            "authorizer": {"jwt": {"claims": {"sub": sub, "custom:user_role": role}}}
         }
     }
     if body:
@@ -63,12 +61,16 @@ class TestCreateEntry:
     def test_creates_entry_successfully(self):
         from progress.create_entry import handler
 
-        event = _make_event("inst-1", "instructor", body={
-            "client_id": "client-1",
-            "workout_type": "Strength",
-            "notes": "Great session",
-            "duration_minutes": 60,
-        })
+        event = _make_event(
+            "inst-1",
+            "instructor",
+            body={
+                "client_id": "client-1",
+                "workout_type": "Strength",
+                "notes": "Great session",
+                "duration_minutes": 60,
+            },
+        )
         result = handler(event, None)
         assert result["statusCode"] == 201
         body = json.loads(result["body"])
@@ -79,11 +81,15 @@ class TestCreateEntry:
     def test_rejects_non_instructor(self):
         from progress.create_entry import handler
 
-        event = _make_event("client-1", "client", body={
-            "client_id": "client-1",
-            "workout_type": "Strength",
-            "notes": "Nope",
-        })
+        event = _make_event(
+            "client-1",
+            "client",
+            body={
+                "client_id": "client-1",
+                "workout_type": "Strength",
+                "notes": "Nope",
+            },
+        )
         result = handler(event, None)
         assert result["statusCode"] == 403
 

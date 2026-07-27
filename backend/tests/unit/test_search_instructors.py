@@ -5,7 +5,9 @@ import os
 import boto3
 from moto import mock_aws
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "src", "handlers"))
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "..", "src", "handlers")
+)
 
 TABLE_NAME = "LiftLinkTable"
 
@@ -35,30 +37,30 @@ def _create_table_and_seed(dynamodb):
         ],
         BillingMode="PAY_PER_REQUEST",
     )
-    for i, (spec, loc) in enumerate([("YOGA", "NYC"), ("YOGA", "LA"), ("PILATES", "NYC")]):
-        table.put_item(Item={
-            "PK": f"INSTRUCTOR#inst-{i}",
-            "SK": "PROFILE",
-            "GSI1PK": f"SPECIALTY#{spec}",
-            "GSI1SK": f"LOCATION#{loc}",
-            "instructor_id": f"inst-{i}",
-            "display_name": f"Instructor {i}",
-            "specialty": spec.lower(),
-            "location": loc,
-            "bio": "",
-            "item_type": "INSTRUCTOR",
-        })
+    for i, (spec, loc) in enumerate(
+        [("YOGA", "NYC"), ("YOGA", "LA"), ("PILATES", "NYC")]
+    ):
+        table.put_item(
+            Item={
+                "PK": f"INSTRUCTOR#inst-{i}",
+                "SK": "PROFILE",
+                "GSI1PK": f"SPECIALTY#{spec}",
+                "GSI1SK": f"LOCATION#{loc}",
+                "instructor_id": f"inst-{i}",
+                "display_name": f"Instructor {i}",
+                "specialty": spec.lower(),
+                "location": loc,
+                "bio": "",
+                "item_type": "INSTRUCTOR",
+            }
+        )
     return table
 
 
 def _make_event(sub: str, role: str, query_params: dict = None) -> dict:
     event = {
         "requestContext": {
-            "authorizer": {
-                "jwt": {
-                    "claims": {"sub": sub, "custom:user_role": role}
-                }
-            }
+            "authorizer": {"jwt": {"claims": {"sub": sub, "custom:user_role": role}}}
         }
     }
     if query_params:
@@ -86,7 +88,9 @@ class TestSearchInstructors:
     def test_search_by_specialty_and_location(self):
         from instructors.search_instructors import handler
 
-        event = _make_event("client-1", "client", query_params={"specialty": "yoga", "location": "NYC"})
+        event = _make_event(
+            "client-1", "client", query_params={"specialty": "yoga", "location": "NYC"}
+        )
         result = handler(event, None)
         assert result["statusCode"] == 200
         body = json.loads(result["body"])

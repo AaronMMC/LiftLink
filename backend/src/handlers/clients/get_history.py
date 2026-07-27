@@ -5,7 +5,12 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from shared.authz import is_resource_owner, is_client
 from shared.db import get_table, progress_pk
-from shared.responses import success_response, error_response, forbidden_response, server_error_response
+from shared.responses import (
+    success_response,
+    error_response,
+    forbidden_response,
+    server_error_response,
+)
 
 from boto3.dynamodb.conditions import Key
 
@@ -42,10 +47,12 @@ def handler(event: dict, context) -> dict:
             for item in result.get("Items", [])
         ]
 
-        return success_response({
-            "entries": entries,
-            "count": len(entries),
-        })
+        return success_response(
+            {
+                "entries": entries,
+                "count": len(entries),
+            }
+        )
     except Exception as e:
         print(f"Error getting history: {e}")
         return server_error_response()

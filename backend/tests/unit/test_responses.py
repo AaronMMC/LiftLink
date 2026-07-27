@@ -2,7 +2,9 @@ import json
 import sys
 import os
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "src", "handlers"))
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "..", "src", "handlers")
+)
 
 from shared.responses import (
     success_response,

@@ -12,7 +12,9 @@ def get_user_id(event: dict) -> Optional[str]:
 def get_user_role(event: dict) -> Optional[str]:
     """Extract the user's role (instructor/client) from JWT claims."""
     try:
-        return event["requestContext"]["authorizer"]["jwt"]["claims"]["custom:user_role"]
+        return event["requestContext"]["authorizer"]["jwt"]["claims"][
+            "custom:user_role"
+        ]
     except (KeyError, TypeError):
         return None
 

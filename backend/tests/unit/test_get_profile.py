@@ -6,7 +6,9 @@ import boto3
 import pytest
 from moto import mock_aws
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "src", "handlers"))
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "..", "src", "handlers")
+)
 
 TABLE_NAME = "LiftLinkTable"
 
@@ -36,27 +38,25 @@ def _create_table_and_seed(dynamodb):
         ],
         BillingMode="PAY_PER_REQUEST",
     )
-    table.put_item(Item={
-        "PK": "INSTRUCTOR#inst-1",
-        "SK": "PROFILE",
-        "instructor_id": "inst-1",
-        "display_name": "Jane",
-        "specialty": "yoga",
-        "location": "NYC",
-        "bio": "Yoga expert",
-        "item_type": "INSTRUCTOR",
-    })
+    table.put_item(
+        Item={
+            "PK": "INSTRUCTOR#inst-1",
+            "SK": "PROFILE",
+            "instructor_id": "inst-1",
+            "display_name": "Jane",
+            "specialty": "yoga",
+            "location": "NYC",
+            "bio": "Yoga expert",
+            "item_type": "INSTRUCTOR",
+        }
+    )
     return table
 
 
 def _make_event(sub: str, role: str, path_params: dict = None) -> dict:
     event = {
         "requestContext": {
-            "authorizer": {
-                "jwt": {
-                    "claims": {"sub": sub, "custom:user_role": role}
-                }
-            }
+            "authorizer": {"jwt": {"claims": {"sub": sub, "custom:user_role": role}}}
         }
     }
     if path_params:

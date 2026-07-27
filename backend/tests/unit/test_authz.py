@@ -1,9 +1,17 @@
 import sys
 import os
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "src", "handlers"))
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "..", "src", "handlers")
+)
 
-from shared.authz import get_user_id, get_user_role, is_resource_owner, is_instructor, is_client
+from shared.authz import (
+    get_user_id,
+    get_user_role,
+    is_resource_owner,
+    is_instructor,
+    is_client,
+)
 
 
 def _make_event(sub: str = "user-123", role: str = "instructor") -> dict:

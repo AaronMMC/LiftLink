@@ -13,7 +13,9 @@ from boto3.dynamodb.conditions import Key
 def handler(event: dict, context) -> dict:
     try:
         if not is_instructor(event):
-            return forbidden_response("Only instructors can list their progress entries")
+            return forbidden_response(
+                "Only instructors can list their progress entries"
+            )
 
         instructor_id = get_user_id(event)
         if not instructor_id:
@@ -39,10 +41,12 @@ def handler(event: dict, context) -> dict:
             for item in result.get("Items", [])
         ]
 
-        return success_response({
-            "entries": entries,
-            "count": len(entries),
-        })
+        return success_response(
+            {
+                "entries": entries,
+                "count": len(entries),
+            }
+        )
     except Exception as e:
         print(f"Error listing entries: {e}")
         return server_error_response()

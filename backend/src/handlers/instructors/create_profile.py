@@ -7,7 +7,12 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from shared.authz import get_user_id, is_instructor
 from shared.db import get_table, instructor_pk, instructor_sk, gsi1_pk, gsi1_sk
-from shared.responses import created_response, error_response, forbidden_response, server_error_response
+from shared.responses import (
+    created_response,
+    error_response,
+    forbidden_response,
+    server_error_response,
+)
 
 
 REQUIRED_FIELDS = ["display_name", "specialty", "location"]
@@ -51,13 +56,15 @@ def handler(event: dict, context) -> dict:
 
         table.put_item(Item=item)
 
-        return created_response({
-            "instructor_id": user_id,
-            "display_name": item["display_name"],
-            "specialty": item["specialty"],
-            "location": item["location"],
-            "bio": item["bio"],
-        })
+        return created_response(
+            {
+                "instructor_id": user_id,
+                "display_name": item["display_name"],
+                "specialty": item["specialty"],
+                "location": item["location"],
+                "bio": item["bio"],
+            }
+        )
     except json.JSONDecodeError:
         return error_response("Invalid JSON in request body")
     except Exception as e:

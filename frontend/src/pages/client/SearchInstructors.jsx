@@ -20,7 +20,7 @@ export default function SearchInstructors() {
       const res = await searchInstructors(params);
       setResults(res.data.instructors);
       setSearched(true);
-    } catch (err) {
+    } catch {
       setError("Search failed. Please try again.");
     } finally {
       setLoading(false);

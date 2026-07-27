@@ -40,10 +40,12 @@ def handler(event: dict, context) -> dict:
             for item in result.get("Items", [])
         ]
 
-        return success_response({
-            "instructors": instructors,
-            "count": len(instructors),
-        })
+        return success_response(
+            {
+                "instructors": instructors,
+                "count": len(instructors),
+            }
+        )
     except Exception as e:
         print(f"Error searching instructors: {e}")
         return server_error_response()

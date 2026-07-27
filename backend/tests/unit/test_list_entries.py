@@ -5,7 +5,9 @@ import os
 import boto3
 from moto import mock_aws
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "src", "handlers"))
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "..", "src", "handlers")
+)
 
 TABLE_NAME = "LiftLinkTable"
 
@@ -36,29 +38,27 @@ def _create_table_and_seed(dynamodb):
         BillingMode="PAY_PER_REQUEST",
     )
     for i in range(3):
-        table.put_item(Item={
-            "PK": "INSTRUCTOR_PROGRESS#inst-1",
-            "SK": f"ENTRY#2026-07-{25-i}T10:00:00#entry-{i}",
-            "entry_id": f"entry-{i}",
-            "instructor_id": "inst-1",
-            "client_id": f"client-{i}",
-            "workout_type": "Strength",
-            "notes": f"Session {i}",
-            "duration_minutes": 60,
-            "created_at": f"2026-07-{25-i}T10:00:00",
-            "item_type": "PROGRESS_ENTRY",
-        })
+        table.put_item(
+            Item={
+                "PK": "INSTRUCTOR_PROGRESS#inst-1",
+                "SK": f"ENTRY#2026-07-{25 - i}T10:00:00#entry-{i}",
+                "entry_id": f"entry-{i}",
+                "instructor_id": "inst-1",
+                "client_id": f"client-{i}",
+                "workout_type": "Strength",
+                "notes": f"Session {i}",
+                "duration_minutes": 60,
+                "created_at": f"2026-07-{25 - i}T10:00:00",
+                "item_type": "PROGRESS_ENTRY",
+            }
+        )
     return table
 
 
 def _make_event(sub: str, role: str) -> dict:
     return {
         "requestContext": {
-            "authorizer": {
-                "jwt": {
-                    "claims": {"sub": sub, "custom:user_role": role}
-                }
-            }
+            "authorizer": {"jwt": {"claims": {"sub": sub, "custom:user_role": role}}}
         }
     }
 

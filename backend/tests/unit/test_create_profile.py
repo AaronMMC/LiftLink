@@ -6,7 +6,9 @@ import boto3
 import pytest
 from moto import mock_aws
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "src", "handlers"))
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "..", "src", "handlers")
+)
 
 
 TABLE_NAME = "LiftLinkTable"
@@ -39,7 +41,13 @@ def _create_table(dynamodb):
     )
 
 
-def _make_event(sub: str, role: str, body: dict = None, path_params: dict = None, query_params: dict = None) -> dict:
+def _make_event(
+    sub: str,
+    role: str,
+    body: dict = None,
+    path_params: dict = None,
+    query_params: dict = None,
+) -> dict:
     event = {
         "requestContext": {
             "authorizer": {
@@ -72,11 +80,15 @@ class TestCreateProfile:
     def test_creates_profile_successfully(self):
         from instructors.create_profile import handler
 
-        event = _make_event("inst-1", "instructor", body={
-            "display_name": "Jane",
-            "specialty": "yoga",
-            "location": "NYC",
-        })
+        event = _make_event(
+            "inst-1",
+            "instructor",
+            body={
+                "display_name": "Jane",
+                "specialty": "yoga",
+                "location": "NYC",
+            },
+        )
         result = handler(event, None)
         assert result["statusCode"] == 201
         body = json.loads(result["body"])
@@ -86,11 +98,15 @@ class TestCreateProfile:
     def test_rejects_non_instructor(self):
         from instructors.create_profile import handler
 
-        event = _make_event("client-1", "client", body={
-            "display_name": "Jane",
-            "specialty": "yoga",
-            "location": "NYC",
-        })
+        event = _make_event(
+            "client-1",
+            "client",
+            body={
+                "display_name": "Jane",
+                "specialty": "yoga",
+                "location": "NYC",
+            },
+        )
         result = handler(event, None)
         assert result["statusCode"] == 403
 
@@ -104,11 +120,15 @@ class TestCreateProfile:
     def test_rejects_duplicate_profile(self):
         from instructors.create_profile import handler
 
-        event = _make_event("inst-1", "instructor", body={
-            "display_name": "Jane",
-            "specialty": "yoga",
-            "location": "NYC",
-        })
+        event = _make_event(
+            "inst-1",
+            "instructor",
+            body={
+                "display_name": "Jane",
+                "specialty": "yoga",
+                "location": "NYC",
+            },
+        )
         handler(event, None)
         result = handler(event, None)
         assert result["statusCode"] == 409

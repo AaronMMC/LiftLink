@@ -5,7 +5,9 @@ import os
 import boto3
 from moto import mock_aws
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", "src", "handlers"))
+sys.path.insert(
+    0, os.path.join(os.path.dirname(__file__), "..", "..", "src", "handlers")
+)
 
 TABLE_NAME = "LiftLinkTable"
 
@@ -35,29 +37,29 @@ def _create_table_and_seed(dynamodb):
         ],
         BillingMode="PAY_PER_REQUEST",
     )
-    table.put_item(Item={
-        "PK": "INSTRUCTOR#inst-1",
-        "SK": "PROFILE",
-        "GSI1PK": "SPECIALTY#YOGA",
-        "GSI1SK": "LOCATION#NYC",
-        "instructor_id": "inst-1",
-        "display_name": "Jane",
-        "specialty": "yoga",
-        "location": "NYC",
-        "bio": "Yoga expert",
-        "item_type": "INSTRUCTOR",
-    })
+    table.put_item(
+        Item={
+            "PK": "INSTRUCTOR#inst-1",
+            "SK": "PROFILE",
+            "GSI1PK": "SPECIALTY#YOGA",
+            "GSI1SK": "LOCATION#NYC",
+            "instructor_id": "inst-1",
+            "display_name": "Jane",
+            "specialty": "yoga",
+            "location": "NYC",
+            "bio": "Yoga expert",
+            "item_type": "INSTRUCTOR",
+        }
+    )
     return table
 
 
-def _make_event(sub: str, role: str, body: dict = None, path_params: dict = None) -> dict:
+def _make_event(
+    sub: str, role: str, body: dict = None, path_params: dict = None
+) -> dict:
     event = {
         "requestContext": {
-            "authorizer": {
-                "jwt": {
-                    "claims": {"sub": sub, "custom:user_role": role}
-                }
-            }
+            "authorizer": {"jwt": {"claims": {"sub": sub, "custom:user_role": role}}}
         }
     }
     if body:
@@ -78,7 +80,12 @@ class TestUpdateProfile:
     def test_updates_own_profile(self):
         from instructors.update_profile import handler
 
-        event = _make_event("inst-1", "instructor", body={"bio": "Updated bio"}, path_params={"id": "inst-1"})
+        event = _make_event(
+            "inst-1",
+            "instructor",
+            body={"bio": "Updated bio"},
+            path_params={"id": "inst-1"},
+        )
         result = handler(event, None)
         assert result["statusCode"] == 200
         body = json.loads(result["body"])
@@ -87,20 +94,26 @@ class TestUpdateProfile:
     def test_rejects_non_owner(self):
         from instructors.update_profile import handler
 
-        event = _make_event("inst-2", "instructor", body={"bio": "Hacked"}, path_params={"id": "inst-1"})
+        event = _make_event(
+            "inst-2", "instructor", body={"bio": "Hacked"}, path_params={"id": "inst-1"}
+        )
         result = handler(event, None)
         assert result["statusCode"] == 403
 
     def test_rejects_client_role(self):
         from instructors.update_profile import handler
 
-        event = _make_event("inst-1", "client", body={"bio": "Nope"}, path_params={"id": "inst-1"})
+        event = _make_event(
+            "inst-1", "client", body={"bio": "Nope"}, path_params={"id": "inst-1"}
+        )
         result = handler(event, None)
         assert result["statusCode"] == 403
 
     def test_rejects_empty_body(self):
         from instructors.update_profile import handler
 
-        event = _make_event("inst-1", "instructor", body={}, path_params={"id": "inst-1"})
+        event = _make_event(
+            "inst-1", "instructor", body={}, path_params={"id": "inst-1"}
+        )
         result = handler(event, None)
         assert result["statusCode"] == 400
