@@ -128,6 +128,10 @@ python -m pytest tests/unit/ -v --tb=short
 # Client A cannot read Client B's history → 403
 ```
 
+## Screenshots
+
+> *Screenshots coming soon!*
+
 ## Project Structure
 
 ```text
