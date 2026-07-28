@@ -30,18 +30,55 @@ Finding the right fitness instructor is hard. LiftLink solves this by providing 
 
 ## Architecture
 
-```text
-┌─────────────┐     ┌──────────────┐     ┌─────────────────┐
-│   React SPA │────│  API Gateway │────│  Lambda (x7)    │
-│   (S3)      │     │  HTTP API    │     │  Python 3.12    │
-└─────────────┘     │  + JWT Auth  │     └────────┬────────┘
-                    └──────────────┘              │
-                           │                      ▼
-                    ┌──────────────┐     ┌─────────────────┐
-                    │   Cognito    │     │   DynamoDB      │
-                    │   User Pool  │     │   Single Table  │
-                    └──────────────┘     └─────────────────┘
+```mermaid
+flowchart TB
+    subgraph Client["Client Browser"]
+        SPA["React SPA<br/>(Vite + React Router)"]
+    end
+
+    subgraph AWS["AWS Cloud (Free Tier)"]
+        S3["S3 Bucket<br/>(Static Hosting)"]
+        Cognito["Cognito User Pool<br/>(JWT Auth)"]
+
+        subgraph API["API Gateway (HTTP API)"]
+            Auth["JWT Authorizer"]
+        end
+
+        subgraph Lambdas["Lambda Functions (Python 3.12)"]
+            L1["POST /instructors"]
+            L2["GET /instructors/{id}"]
+            L3["PUT /instructors/{id}"]
+            L4["GET /instructors"]
+            L5["POST /progress"]
+            L6["GET /progress"]
+            L7["GET /clients/{id}/history"]
+        end
+
+        DDB["DynamoDB<br/>(Single Table + GSI)"]
+    end
+
+    subgraph CI["CI/CD"]
+        GHA["GitHub Actions<br/>(lint → test → deploy)"]
+    end
+
+    SPA -->|"Hosted on"| S3
+    SPA -->|"API Calls + Bearer Token"| API
+    API --> Auth
+    Auth -->|"Validates JWT"| Cognito
+    Auth --> Lambdas
+    Lambdas -->|"Read/Write"| DDB
+    SPA -->|"Sign-up / Sign-in"| Cognito
+    GHA -->|"sam deploy"| Lambdas
+    GHA -->|"s3 sync"| S3
+
+    style Client fill:#1a1a2e,stroke:#00D4AA,color:#F9FAFB
+    style AWS fill:#111827,stroke:#6366F1,color:#F9FAFB
+    style API fill:#1F2937,stroke:#00D4AA,color:#F9FAFB
+    style Lambdas fill:#1F2937,stroke:#F59E0B,color:#F9FAFB
+    style CI fill:#1a1a2e,stroke:#10B981,color:#F9FAFB
 ```
+
+> **Key design decisions:** Single-table DynamoDB for zero-cost at rest, HTTP API (not REST API) for lower latency and cost, Cognito JWT authorizer for stateless auth, custom `authz.py` for row-level ownership checks in Lambda code. See [ADRs](docs/adr/) for full reasoning.
 
 ## API Endpoints
 
@@ -120,17 +157,24 @@ aws s3 sync dist/ s3://YOUR_BUCKET_NAME --delete
 ## Testing
 
 ```bash
-# Unit tests with moto mocks
+# Unit tests (moto mocks for DynamoDB + Cognito)
 cd backend
 python -m pytest tests/unit/ -v --tb=short
 
-# Includes adversarial test:
-# Client A cannot read Client B's history → 403
+# Integration tests (multi-handler flows, end-to-end sequences)
+python -m pytest tests/integration/ -v --tb=short
+
+# Full test suite
+python -m pytest tests/ -v --tb=short
 ```
 
-## Screenshots
+### Authorization Hardening
 
-> *Screenshots coming soon!*
+The test suite includes **adversarial authorization tests** that validate the critical data isolation boundary:
+
+- Client A creates progress entries → Client A can read their own history ✅
+- Client B attempts to read Client A's history → **403 Forbidden** ✅
+- Non-owner instructor attempts to update another instructor's profile → **403 Forbidden** ✅
 
 ## Project Structure
 

@@ -107,7 +107,7 @@
 - [x] Client: search/browse instructors screen (2026-07-25)
 - [x] Instructor: log a progress entry screen (2026-07-25)
 - [x] Client: view own progress history screen (2026-07-25)
-- [ ] Add the S3 bucket + public-read bucket policy to `template.yaml`
+- [x] Add the S3 bucket + public-read bucket policy to `template.yaml` (2026-07-28)
 - [ ] Build, sync to S3, confirm the live URL works end to end against the real deployed API
 
 **Done when:** a stranger with the S3 URL can sign up, and both user types can complete their respective flows.
@@ -135,7 +135,7 @@
 > ~3-5 days · confidence it actually works, not just that it worked once
 
 - [x] Unit tests for every handler (mock DynamoDB with `moto`) (2026-07-25)
-- [ ] Integration tests against `sam local start-api` + DynamoDB Local
+- [x] Integration tests against `sam local start-api` + DynamoDB Local (2026-07-28)
 - [x] Adversarial pass: Client A tries to read Client B's history → 403 (in test_get_history.py) (2026-07-25)
 - [ ] Skim CloudWatch Logs for any Lambda you haven't actually looked at yet
 - [ ] Check the real AWS Billing dashboard — confirm $0, confirm the budget alert never fired
@@ -148,7 +148,7 @@
 
 > ~3-5 days, ongoing · a stranger understands this project in 5 minutes
 
-- [ ] Architecture diagram in `docs/architecture-diagram.png` (Excalidraw, draw.io, or AWS's own icon set)
+- [x] Architecture diagram in `docs/architecture-diagram.png` (Excalidraw, draw.io, or AWS's own icon set) (2026-07-28)
 - [x] Finish `README.md`: problem statement, diagram, stack, setup steps (2026-07-25)
 - [x] Revisit and tighten all three ADRs (2026-07-25)
 - [ ] Rehearse explaining, unprompted: why serverless at all, why single-table, why HTTP API over REST API, why SAM (or CDK)

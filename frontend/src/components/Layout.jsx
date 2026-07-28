@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
@@ -5,10 +6,15 @@ export default function Layout({ children }) {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
+  const [menuOpen, setMenuOpen] = useState(false);
+
   const handleLogout = () => {
     logout();
     navigate("/");
+    setMenuOpen(false);
   };
+
+  const closeMenu = () => setMenuOpen(false);
 
   return (
     <div className="layout">
@@ -19,20 +25,30 @@ export default function Layout({ children }) {
             <span className="logo-text">LiftLink</span>
           </Link>
 
-          <div className="nav-links">
+          <button 
+            className={`nav-toggle ${menuOpen ? 'active' : ''}`}
+            onClick={() => setMenuOpen(!menuOpen)}
+            aria-label="Toggle navigation"
+          >
+            <span></span>
+            <span></span>
+            <span></span>
+          </button>
+
+          <div className={`nav-links ${menuOpen ? 'open' : ''}`}>
             {user ? (
               <>
-                <Link to="/dashboard" className="nav-link">Dashboard</Link>
+                <Link to="/dashboard" className="nav-link" onClick={closeMenu}>Dashboard</Link>
                 {user.role === "instructor" && (
                   <>
-                    <Link to="/instructor/profile/create" className="nav-link">Profile</Link>
-                    <Link to="/instructor/progress" className="nav-link">Log Progress</Link>
+                    <Link to="/instructor/profile/create" className="nav-link" onClick={closeMenu}>Profile</Link>
+                    <Link to="/instructor/progress" className="nav-link" onClick={closeMenu}>Log Progress</Link>
                   </>
                 )}
                 {user.role === "client" && (
                   <>
-                    <Link to="/client/search" className="nav-link">Find Instructors</Link>
-                    <Link to="/client/history" className="nav-link">My Progress</Link>
+                    <Link to="/client/search" className="nav-link" onClick={closeMenu}>Find Instructors</Link>
+                    <Link to="/client/history" className="nav-link" onClick={closeMenu}>My Progress</Link>
                   </>
                 )}
                 <button onClick={handleLogout} className="btn btn-outline btn-sm">
@@ -41,8 +57,8 @@ export default function Layout({ children }) {
               </>
             ) : (
               <>
-                <Link to="/login" className="nav-link">Sign In</Link>
-                <Link to="/register" className="btn btn-primary btn-sm">Get Started</Link>
+                <Link to="/login" className="nav-link" onClick={closeMenu}>Sign In</Link>
+                <Link to="/register" className="btn btn-primary btn-sm" onClick={closeMenu}>Get Started</Link>
               </>
             )}
           </div>

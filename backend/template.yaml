@@ -120,6 +120,32 @@ Resources:
               audience:
                 - !Ref LiftLinkUserPoolClient
 
+  # ─── S3 Frontend Hosting ───
+  LiftLinkFrontendBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub "liftlink-frontend-${Stage}"
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: false
+        BlockPublicPolicy: false
+        IgnorePublicAcls: false
+        RestrictPublicBuckets: false
+      WebsiteConfiguration:
+        IndexDocument: index.html
+        ErrorDocument: index.html
+
+  LiftLinkFrontendBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref LiftLinkFrontendBucket
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal: "*"
+            Action: s3:GetObject
+            Resource: !Sub "arn:aws:s3:::${LiftLinkFrontendBucket}/*"
+
   # ─── Lambda Functions ───
   CreateProfileFunction:
     Type: AWS::Serverless::Function
@@ -256,3 +282,11 @@ Outputs:
   TableName:
     Description: DynamoDB Table Name
     Value: !Ref LiftLinkTable
+
+  FrontendBucketName:
+    Description: Name of the frontend S3 bucket
+    Value: !Ref LiftLinkFrontendBucket
+
+  FrontendWebsiteUrl:
+    Description: URL of the frontend website
+    Value: !GetAtt LiftLinkFrontendBucket.WebsiteURL
